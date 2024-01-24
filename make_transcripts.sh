@@ -12,7 +12,7 @@
 # -t  Transcribe mp3 file(s) to txt file(s)
 # -s  Summarize txt files
 #       Requires summary type arg:
-#       notes, points, or paras
+#       notes, points, paras, parasOrg, or parasSum
 
 # begun 2024-01-23 by adc
 
@@ -131,7 +131,10 @@ fi
 # Analyze the transcript with chatGPT using the llm CLI tool
 #-----------------------------------------------------------
 
-if [ $PROMPT_TYPE="points" ]; then
+# NOTE: NEED to have spaces separated the equals sign from the other characters around it!
+# [ "a" = "b" ] is OK; [ "a"="b" ] is BAD, it will always eval. as true.
+
+if [ "$PROMPT_TYPE" = "points" ]; then
 
     for f in $(ls ${MP3_IN%.mp3}_*.mp3.txt); do
 
@@ -144,7 +147,7 @@ if [ $PROMPT_TYPE="points" ]; then
 fi
 
 
-if [ $PROMPT_TYPE="notes" ]; then
+if [ "$PROMPT_TYPE" = "notes" ]; then
 
     for f in $(ls ${MP3_IN%.mp3}_*.mp3.txt); do
 
@@ -160,7 +163,7 @@ fi
 
 
 
-if [ $PROMPT_TYPE="paras" ]; then
+if [ "$PROMPT_TYPE" = "paras" ]; then
 
     for f in $(ls ${MP3_IN%.mp3}_*.mp3.txt); do
 
@@ -171,6 +174,39 @@ if [ $PROMPT_TYPE="paras" ]; then
     done
 
     
+    for f in $(ls ${MP3_IN%.mp3}_*_GPT_PARAS.txt); do
+
+	echo "Summarizing each paragraph of $f ";
+
+	cat $f | llm -s "$PROMPT_SUMMARIZE_PARAS" > ${f%.txt}_SUMMARY.txt
+
+    done
+    
+
+fi
+
+
+# If want to organize into paragraphs ONLY
+
+if [ "$PROMPT_TYPE" = "parasOrg" ]; then
+
+    for f in $(ls ${MP3_IN%.mp3}_*.mp3.txt); do
+
+	echo "Organizing $f into paragraphs";
+
+	cat $f | llm -s "$PROMPT_PARAS" > ${f%.mp3.txt}_GPT_PARAS.txt
+
+    done
+
+fi
+
+
+
+
+# If want to REDO the paragraph summaries only, not the organizing into paragraphs
+
+if [ "$PROMPT_TYPE" = "parasSum" ]; then
+
     for f in $(ls ${MP3_IN%.mp3}_*_GPT_PARAS.txt); do
 
 	echo "Summarizing each paragraph of $f ";
