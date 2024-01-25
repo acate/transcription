@@ -2,7 +2,7 @@
 
 # make_transcripts.sh
 #
-# Requires:
+# Requires as input:
 #
 # -i followed by .mp3 input file name 
 #
@@ -16,6 +16,7 @@
 # -c  Concatenate txt files
 #       Requires summary type arg:
 #       notes, points, paras, or parasOrg
+# --help  To see options
 
 
 # begun 2024-01-23 by adc
@@ -253,20 +254,24 @@ fi
 
 
 
+#----------------------------------------------------------------------
 # To concatenate all summary files of a given type into one big file,
 #   with a divider placed at the end of each component file's contents
+#----------------------------------------------------------------------
 
 if [ "$CONCAT_TYPE" = "points" ]; then
+
+    allFile="${MP3_IN%.mp3}_GPT_POINTS_ALL.txt"
 
     for f in $(ls ${MP3_IN%.mp3}_*_GPT_POINTS.txt); do
 
 	echo "Concatenating to the single larger file: $f ";
 
-	cat $f >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
+	cat $f >> $allFile
 	
-	echo "" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
-	echo "-----------------------------------------" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
-	echo "" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt	
+	echo "" >> $allFile
+	echo "-----------------------------------------" >> $allFile
+	echo "" >> $allFile
 
     done
     
@@ -275,15 +280,17 @@ fi
 
 if [ "$CONCAT_TYPE" = "notes" ]; then
 
+    allFile="${MP3_IN%.mp3}_GPT_NOTES_ALL.txt"
+
     for f in $(ls ${MP3_IN%.mp3}_*_GPT_NOTES.txt); do
 
 	echo "Concatenating to the single larger file: $f ";
 
-	cat $f >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
+	cat $f >> $allFile
 	
-	echo "" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
-	echo "-----------------------------------------" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
-	echo "" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt	
+	echo "" >> $allFile
+	echo "-----------------------------------------" >> $allFile
+	echo "" >> $allFile
 
     done
     
