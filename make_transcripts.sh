@@ -13,6 +13,10 @@
 # -s  Summarize txt files
 #       Requires summary type arg:
 #       notes, points, paras, parasOrg, or parasSum
+# -c  Concatenate txt files
+#       Requires summary type arg:
+#       notes, points, paras, or parasOrg
+
 
 # begun 2024-01-23 by adc
 
@@ -74,6 +78,34 @@ while test $# -gt 0; do
 	    fi
 	    shift
 	    ;;
+	-c)
+	    shift
+	    if test $# -gt 0; then
+		export CONCAT_TYPE=$1
+	    else
+		echo "No type of summary file to concatenate specified"
+		exit 1
+	    fi
+	    shift
+	    ;;
+	--help)
+	    echo -e " make_transcripts.sh \n \
+\n \
+Requires: \n \
+ -i followed by .mp3 input file name \n \
+ \n \
+Optional flags: \n \
+  -p  sPlit mp3 file into 10 minute chunks \n \
+  -t  Transcribe mp3 file(s) to txt file(s) \n \
+  -s  Summarize txt files \n \
+    Requires summary type arg: \n \
+    notes, points, paras, parasOrg, or parasSum \n \
+	 \n \
+  -c  Concatenate txt files \n \
+    Requires summary type arg: \n \
+    notes, points, paras, or parasOrg \n"
+	    shift
+	    ;;
 	*)
 	    break
 	    ;;
@@ -87,7 +119,7 @@ done
 #------------------------------------------------------
 
 if [ -z ${MP3_IN+x} ]; then
-    echo "Please add -i input_file.mp3 to the command"
+    echo "Please add -i input_file.mp3 to the command, or --help to see list of options"
     exit 1
 fi
 
@@ -221,9 +253,84 @@ fi
 
 
 
+# To concatenate all summary files of a given type into one big file,
+#   with a divider placed at the end of each component file's contents
+
+if [ "$CONCAT_TYPE" = "points" ]; then
+
+    for f in $(ls ${MP3_IN%.mp3}_*_GPT_POINTS.txt); do
+
+	echo "Concatenating to the single larger file: $f ";
+
+	cat $f >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
+	
+	echo "" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
+	echo "-----------------------------------------" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt
+	echo "" >> ${MP3_IN%.mp3}_GPT_POINTS_ALL.txt	
+
+    done
+    
+fi
+
+
+if [ "$CONCAT_TYPE" = "notes" ]; then
+
+    for f in $(ls ${MP3_IN%.mp3}_*_GPT_NOTES.txt); do
+
+	echo "Concatenating to the single larger file: $f ";
+
+	cat $f >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
+	
+	echo "" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
+	echo "-----------------------------------------" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt
+	echo "" >> ${MP3_IN%.mp3}_GPT_NOTES_ALL.txt	
+
+    done
+    
+fi
 
 
 
+# The summaries of the paragraphs
+
+if [ "$CONCAT_TYPE" = "paras" ]; then
+
+    allFile="${MP3_IN%.mp3}_GPT_PARAS_SUMMARY_ALL.txt"
+    
+    for f in $(ls ${MP3_IN%.mp3}_*_GPT_PARAS_SUMMARY.txt); do
+
+	echo "Concatenating to the single larger file: $f ";
+
+	cat $f >> $allFile
+	
+	echo "" >> $allFile
+	echo "-----------------------------------------" >> $allFile
+	echo "" >> $allFile
+
+    done
+    
+fi
+
+
+# The original paragraphs, not the summaries of them
+
+if [ "$CONCAT_TYPE" = "parasOrg" ]; then
+
+    allFile="${MP3_IN%.mp3}_GPT_PARAS_ALL.txt"
+    
+    for f in $(ls ${MP3_IN%.mp3}_*_GPT_PARAS.txt); do
+
+	echo "Concatenating to the single larger file: $f ";
+
+	cat $f >> $allFile
+	
+	echo "" >> $allFile
+	echo "-----------------------------------------" >> $allFile
+	echo "" >> $allFile
+
+    done
+    
+fi
 
 
 
